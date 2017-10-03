@@ -24,6 +24,7 @@ import com.solacesystems.jcsmp.JCSMPStreamingPublishEventHandler;
 import com.solacesystems.jcsmp.ProducerEventArgs;
 import com.solacesystems.jcsmp.SessionEventArgs;
 import com.solacesystems.jcsmp.SessionEventHandler;
+import com.solacesystems.jcsmp.SpringJCSMPFactory;
 import com.solacesystems.jcsmp.TextMessage;
 import com.solacesystems.jcsmp.Topic;
 import com.solacesystems.jcsmp.XMLMessageProducer;
@@ -35,11 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
+@SuppressWarnings("unused")
 public class sendJSONMessageJCSMP implements JCSMPProducerEventHandler {
 	
-//	 private static final Logger logger = LogManager.getLogger(sendJSONMessageJCSMP.class);
-//	private static final Logger logger = LoggerFactory.getLogger(Runner.class);
 	private static final Logger logger = LoggerFactory.getLogger(sendJSONMessageJCSMP.class);
 	
 	int counter = 0;
@@ -49,6 +48,8 @@ public class sendJSONMessageJCSMP implements JCSMPProducerEventHandler {
 	  public static int PRETTY_PRINT_INDENT_FACTOR = 4;
 	
 	Topic topic;
+	
+	SpringJCSMPFactory solaceFactory = null;
 	JCSMPSession session = null;
 	XMLMessageProducer prod = null;
 	
@@ -56,38 +57,28 @@ public class sendJSONMessageJCSMP implements JCSMPProducerEventHandler {
 	TextMessage textMsg = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
 
 	
-	public sendJSONMessageJCSMP(String user, String password, String vpn, String topicString, String host, String port) {
+	public sendJSONMessageJCSMP(SpringJCSMPFactory _solaceFactory) {
 		
-		JCSMPProperties properties = new JCSMPProperties();
-		properties.setProperty(JCSMPProperties.HOST, host + ":" + port);
-		properties.setProperty(JCSMPProperties.VPN_NAME, vpn);
-		properties.setProperty(JCSMPProperties.USERNAME, user);
-		properties.setProperty(JCSMPProperties.PASSWORD, password);
-		this.topic = JCSMPFactory.onlyInstance().createTopic(topicString);
-		properties.setProperty(JCSMPProperties.MESSAGE_ACK_MODE, JCSMPProperties.SUPPORTED_MESSAGE_ACK_AUTO);
-		properties.setProperty(JCSMPProperties.GENERATE_SEQUENCE_NUMBERS, true);
-		//needed for DR
-		properties.setProperty(JCSMPProperties.GD_RECONNECT_FAIL_ACTION, JCSMPProperties.GD_RECONNECT_FAIL_ACTION_AUTO_RETRY);
+		this.solaceFactory = _solaceFactory;
 		
-		JCSMPChannelProperties c_properties = (JCSMPChannelProperties) properties.getProperty(JCSMPProperties.CLIENT_CHANNEL_PROPERTIES);
-		c_properties.setConnectRetries(-1);
-		c_properties.setConnectRetriesPerHost(1);
-		c_properties.setConnectTimeoutInMillis(200);
-
-		c_properties.setReconnectRetries(-1);	
-		c_properties.setReconnectRetryWaitInMillis(200);
-
-
-
+		if( System.getenv("MSG_TOPIC") !=null) {
+			this.topic = JCSMPFactory.onlyInstance().createTopic(System.getenv("MSG_TOPIC"));
+			logger.info("Publishing Topic is set to: " + this.topic);
+		} else {
+			this.topic = JCSMPFactory.onlyInstance().createTopic("bank/data/json");
+			logger.info("Publishing Topic is set to: " + this.topic);
+		}
 		
 		
 		try {
-			session = JCSMPFactory.onlyInstance().createSession(properties, null, new PrintingSessionEventHandler());
+			session = solaceFactory.createSession(null, new PrintingSessionEventHandler());
 			
 		} catch (InvalidPropertiesException e) {
-			// TODO Auto-generated catch block
+			logger.info("================================" +e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		
+		
 		try {
 			prod = session.getMessageProducer(new PubCallback());
 		} catch (JCSMPException e) {
@@ -101,9 +92,6 @@ public class sendJSONMessageJCSMP implements JCSMPProducerEventHandler {
 
 	public void sendJSON_JCSMP(ByteArrayOutputStream soapArrayOut) {//throws ClientProtocolException, IOException {
 		
-	
-		//BasicHttpContext localcontext = null;
-		//HttpEntity httpEntity = null;
 		
 		if(counter % 500 == 0 && counter != 0)
 			System.out.println("Sent " + counter + " messages .......");
@@ -118,11 +106,7 @@ public class sendJSONMessageJCSMP implements JCSMPProducerEventHandler {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		//System.out.println(jsonText);
-		
-		
-		//TextMessage textMsg = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
-		//textMsg.setText(soapArrayOut.toString());
+
 		textMsg.clearAttachment();
 		textMsg.clearContent();
 		textMsg.setText(jsonText);
@@ -168,6 +152,7 @@ public class sendJSONMessageJCSMP implements JCSMPProducerEventHandler {
 				i.acked = true;
 				System.out.printf("Message response (rejected) received for %s, error was %s \n", i, cause);
 				msgList.remove(i);
+				
 			}
 		}
 
@@ -179,6 +164,7 @@ public class sendJSONMessageJCSMP implements JCSMPProducerEventHandler {
 				//System.out.printf("Message response (accepted) received for %s \n", i);
 				msgList.remove(i);
 				//System.out.println("Size of msgList: " + msgList.size());
+				//System.out.println("Msg Remove");
 			}
 			
 		}
@@ -214,6 +200,7 @@ public class sendJSONMessageJCSMP implements JCSMPProducerEventHandler {
 	public class PrintingSessionEventHandler implements SessionEventHandler {
         public void handleEvent(SessionEventArgs event) {
             System.out.printf("Received Session Event %s with info %s\n", event.getEvent(), event.getInfo());
+            logger.info("Received Session Event %s with info %s\n", event.getEvent(), event.getInfo());
             
         }
 	}
@@ -221,6 +208,7 @@ public class sendJSONMessageJCSMP implements JCSMPProducerEventHandler {
 	@Override
 	public void handleEvent(ProducerEventArgs event) {
 		System.out.println("Event= " + event.getEvent() +"; Info= " + event.getInfo());
+		logger.info("Event= " + event.getEvent() +"; Info= " + event.getInfo());
 		
 	}
 

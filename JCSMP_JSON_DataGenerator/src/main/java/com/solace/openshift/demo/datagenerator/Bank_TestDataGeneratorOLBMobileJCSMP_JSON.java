@@ -51,17 +51,36 @@ import com.bank.ecs.ArrayOfEvtInputLayout;
 import com.bank.ecs.ArrayOfEvtPrtyInfo;
 import com.bank.ecs.EventInputBundleImplService;
 import com.bank.ecs.RunEventInputBundle;
+import com.solace.labs.spring.boot.autoconfigure.SolaceJavaProperties;
+import com.solacesystems.jcsmp.JCSMPSession;
+import com.solacesystems.jcsmp.SpringJCSMPFactory;
 
 import ecs.data.EVTINPUTBUNDLE;
 import ecs.data.EvtActvyTypFeatureReltn;
 import ecs.data.EvtInputLayout;
 import ecs.data.EvtPrtyInfo;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
+import org.springframework.stereotype.Component;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@SuppressWarnings("unused")
+@SpringBootApplication
 public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
+	private static final Logger logger = LoggerFactory.getLogger(Bank_TestDataGeneratorOLBMobileJCSMP_JSON.class);
+	
+	@Autowired
+	private SpringJCSMPFactory solaceFactory;
 
 	SchemaFactory sf = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema"); 
-	private static int counter = 0;
+	//private static int counter = 0;
 	//private static String url = "http://www.apache.org/";
 	private static Map<Integer, String> appCode = new HashMap<Integer, String>();
 	private static Map<Integer, String> computerCenterCode = new HashMap<Integer, String>();
@@ -73,15 +92,10 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 	private volatile static UUID guuid  = null;
 	private volatile static EvtInputLayout dataRecord = null;
 
-	private static String user;
-	private static String password;
-	private static String vpn;
-	private static String host;
-	private static String port;
-	private static String rate;
-	private static String topic;
+	
 
 	private final static String salt="DGE$5SGr@3VsHYUMas2323E4d57vfBfFSTRU@!DSH(*%FDSdfg13sgfsg";
+	
 
 	/********************
 	 * 
@@ -89,129 +103,193 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 	 * @param args
 	 * 
 	 ******************/
-
+	
+	//@Autowired
 	public static void main(String[] args) {
 
-		user = args[0];
-		password = args[1];
-		vpn = args[2];
-		topic = args[3];
-		host = args[4];
-		port = args[5];
-		rate = args[6];
-
-
-		//sendJSONMessageJCSMP sendJSONFactory = new sendJSONMessageJCSMP(user, password, vpn, topic , host, port);
-		sendJSONMessageJCSMP_DR sendJSONFactory = new sendJSONMessageJCSMP_DR(user, password, vpn, topic , host, port);
-		
-
-		//appCode choices
-		appCode.put(1, "CK00");
-		appCode.put(2, "1000");
-		appCode.put(3, "5E00");
-		appCode.put(4, "HN00");
-		appCode.put(5, "5Q00");
-		appCode.put(6, "JC00");
-		appCode.put(7, "UAK0");
-		appCode.put(8, "VLV0");
-		appCode.put(9, "UAW0");
-		appCode.put(10, "UHY0");
-		appCode.put(11, "YEY0");
-
-		//Computer Center Codes
-		computerCenterCode.put(1,  "2");
-		computerCenterCode.put(2,  "3");
-		computerCenterCode.put(3,  "6");
-
-		//Mobile Device
-		device.put(1, "002"); //Phone
-		device.put(2, "003"); //Tablet
-
-		//Mobile Operating Systems
-		deviceOS.put(1, "001");  //IOS
-		deviceOS.put(2, "002");  //Android
-		deviceOS.put(3, "003");  //Backberry
-		deviceOS.put(4, "004");  //Windows
-
-		//Mobile Operator Code
-		mobileOp.put(1, "001");
-		mobileOp.put(2, "002");
-		mobileOp.put(3, "003");
-		mobileOp.put(4, "004");
-		mobileOp.put(5, "999");
-
-		//int counter = 0;
-
-
-		JAXBContext jc_ecsData = null;
-		ClassLoader cl_ecsData = ecs.data.ObjectFactory.class.getClassLoader();
-		try {
-			jc_ecsData = JAXBContext.newInstance("ecs.data", cl_ecsData);
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		Marshaller jaxbMarshallerEcsData = null;
-		try {
-			//jaxbMarshallerEcs = jc_ecs.createMarshaller();
-			jaxbMarshallerEcsData = jc_ecsData.createMarshaller();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		System.out.println("Sleep in millis between messages; " + 1000/Integer.valueOf(rate));
-
+			SpringApplication.run(Bank_TestDataGeneratorOLBMobileJCSMP_JSON.class, args);
+	}
 	
+	/******************************************************
+	 * 
+	 * Runner()
+	 * @return
+	 * 
+	 ******************************************************/
+	@Component
+	static class Runner implements CommandLineRunner {
 		
-		while(true) {
+		private static final Logger logger = LoggerFactory.getLogger(Runner.class);
+		
+		private String rate = null;
+		
+		@Autowired
+		SpringJCSMPFactory solaceFactory;
 
-			//1=OLB 2=Mobile
-			if(randInt(1,2) == 1) {
-				ByteArrayOutputStream JSONData  = signInOLB(jaxbMarshallerEcsData);
-				sendJSONFactory.sendJSON_JCSMP(JSONData);
-				ByteArrayOutputStream JSONTransOLBData = transactionMultiPayBillOLB(jaxbMarshallerEcsData);
-				sendJSONFactory.sendJSON_JCSMP(JSONTransOLBData);
-				try { Thread.sleep(1000/Integer.valueOf(rate)); } catch (InterruptedException e) {}
-				//counter++;
+		
+		@Override
+		public void run(String... strings) throws Exception {
+			
+			// Get the rate to generate messages from the MSG_RATE Shell variable or use 10 msg/sec
+	        if( System.getenv("MSG_RATE") !=null)
+	        {
+	        		rate = System.getenv("MSG_RATE");
+	        } else {
+	        		rate = "10";
+	        }
+			
+			// Gets JCSMP properties via SPringBoot from "application.properties" file, which can be overridden with shell variable
+	        // For example "solace.java.host = 160.101.136.65" can be overidden with "export solace_java_host=160.101.136.65" 
+			//final JCSMPSession session = solaceFactory.createSession();
 
+			
+
+			
+			sendJSONMessageJCSMP_DR sendJSONFactory_DR = null;
+			sendJSONMessageJCSMP sendJSONFactory = null;
+			boolean useDR = false;
+			
+			// DO you want to use Solace DR-aware publisher or regular publisher
+			if( System.getenv("MSG_DR") != null) {
+				if( Boolean.parseBoolean(System.getenv("MSG_DR"))) {
+					sendJSONFactory_DR = new sendJSONMessageJCSMP_DR(solaceFactory);
+					useDR = true;
+					logger.info("Using DR-enhanced publisher? " + useDR );
+				} else {
+					sendJSONFactory = new sendJSONMessageJCSMP(solaceFactory);
+					logger.info("Using DR-enhanced publisher? " + useDR );
+				}
+				
 			} else {
+				sendJSONFactory = new sendJSONMessageJCSMP(solaceFactory);
+				logger.info("Using DR-enhanced publisher? " + useDR );
+			}
+			
+			
 
-				ByteArrayOutputStream JSONData  = signInMobile(jaxbMarshallerEcsData);
-				sendJSONFactory.sendJSON_JCSMP(JSONData);
-				ByteArrayOutputStream JSONTransMobileData = transactionMultiPayBillMobile(jaxbMarshallerEcsData);
-				sendJSONFactory.sendJSON_JCSMP(JSONTransMobileData);
-				try { Thread.sleep(1000/Integer.valueOf(rate)); } catch (InterruptedException e) {}
-				//counter++;
+			//appCode choices
+			appCode.put(1, "CK00");
+			appCode.put(2, "1000");
+			appCode.put(3, "5E00");
+			appCode.put(4, "HN00");
+			appCode.put(5, "5Q00");
+			appCode.put(6, "JC00");
+			appCode.put(7, "UAK0");
+			appCode.put(8, "VLV0");
+			appCode.put(9, "UAW0");
+			appCode.put(10, "UHY0");
+			appCode.put(11, "YEY0");
+
+			//Computer Center Codes
+			computerCenterCode.put(1,  "2");
+			computerCenterCode.put(2,  "3");
+			computerCenterCode.put(3,  "6");
+
+			//Mobile Device
+			device.put(1, "002"); //Phone
+			device.put(2, "003"); //Tablet
+
+			//Mobile Operating Systems
+			deviceOS.put(1, "001");  //IOS
+			deviceOS.put(2, "002");  //Android
+			deviceOS.put(3, "003");  //Backberry
+			deviceOS.put(4, "004");  //Windows
+
+			//Mobile Operator Code
+			mobileOp.put(1, "001");
+			mobileOp.put(2, "002");
+			mobileOp.put(3, "003");
+			mobileOp.put(4, "004");
+			mobileOp.put(5, "999");
+
+			//int counter = 0;
+
+
+			JAXBContext jc_ecsData = null;
+			ClassLoader cl_ecsData = ecs.data.ObjectFactory.class.getClassLoader();
+			try {
+				jc_ecsData = JAXBContext.newInstance("ecs.data", cl_ecsData);
+			} catch (JAXBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 
+			Marshaller jaxbMarshallerEcsData = null;
+			try {
+				jaxbMarshallerEcsData = jc_ecsData.createMarshaller();
+			} catch (JAXBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			//System.out.println("Sleep in millis between messages; " + 1000/Integer.valueOf(rate));
+			logger.info("Sleep in millis between messages; " + 1000/Integer.valueOf(rate));
+		
+			
+			while(true) {
+
+				//1=OLB 2=Mobile
+				if(randInt(1,2) == 1) {
+					ByteArrayOutputStream JSONData  = signInOLB(jaxbMarshallerEcsData);
+					if(!(useDR)) {
+						sendJSONFactory.sendJSON_JCSMP(JSONData);
+					} else {
+						sendJSONFactory_DR.sendJSON_JCSMP(JSONData);
+					}
+					
+					ByteArrayOutputStream JSONTransOLBData = transactionMultiPayBillOLB(jaxbMarshallerEcsData);
+					if(!(useDR)) {
+						sendJSONFactory.sendJSON_JCSMP(JSONTransOLBData);
+					} else {
+						sendJSONFactory_DR.sendJSON_JCSMP(JSONTransOLBData);
+					}
+					try { Thread.sleep(1000/Integer.valueOf(rate)); } catch (InterruptedException e) {}
+					//counter++;
+
+				} else {
+
+					ByteArrayOutputStream JSONData  = signInMobile(jaxbMarshallerEcsData);
+					if(!(useDR)) {
+						sendJSONFactory.sendJSON_JCSMP(JSONData);
+					} else {
+						sendJSONFactory_DR.sendJSON_JCSMP(JSONData);
+					}
+					ByteArrayOutputStream JSONTransMobileData = transactionMultiPayBillMobile(jaxbMarshallerEcsData);
+					if(!(useDR)) {
+						sendJSONFactory.sendJSON_JCSMP(JSONTransMobileData);
+					} else {
+						sendJSONFactory_DR.sendJSON_JCSMP(JSONTransMobileData);
+					}
+					try { Thread.sleep(1000/Integer.valueOf(rate)); } catch (InterruptedException e) {}
+					//counter++;
+				}
 
 
 
+
+			}
+			
+			 
+
+			/* send single OLB login and transaction. 
+			ByteArrayOutputStream JSONData  = signInOLB(jaxbMarshallerEcsData);
+			sendJSONFactory.sendJSON_JCSMP(JSONData);
+			ByteArrayOutputStream JSONTransOLBData = transactionMultiPayBillOLB(jaxbMarshallerEcsData);
+			sendJSONFactory.sendJSON_JCSMP(JSONTransOLBData);
+			try { Thread.sleep(1000/Integer.valueOf(rate)); } catch (InterruptedException e) {}
+			*/
+
+
+			/* send single OLB login and transaction.  
+			ByteArrayOutputStream JSONData  = signInMobile(jaxbMarshallerEcsData);
+			sendJSONFactory.sendJSON_JCSMP(JSONData);
+			ByteArrayOutputStream JSONTransMobileData = transactionMultiPayBillMobile(jaxbMarshallerEcsData);
+			sendJSONFactory.sendJSON_JCSMP(JSONTransMobileData);
+			try { Thread.sleep(1000/Integer.valueOf(rate)); } catch (InterruptedException e) {}
+			*/
+			
 		}
 		
-		 
-
-		/* send single OLB login and transaction. 
-		ByteArrayOutputStream JSONData  = signInOLB(jaxbMarshallerEcsData);
-		sendJSONFactory.sendJSON_JCSMP(JSONData);
-		ByteArrayOutputStream JSONTransOLBData = transactionMultiPayBillOLB(jaxbMarshallerEcsData);
-		sendJSONFactory.sendJSON_JCSMP(JSONTransOLBData);
-		try { Thread.sleep(1000/Integer.valueOf(rate)); } catch (InterruptedException e) {}
-		*/
-
-
-		/* send single OLB login and transaction.  
-		ByteArrayOutputStream JSONData  = signInMobile(jaxbMarshallerEcsData);
-		sendJSONFactory.sendJSON_JCSMP(JSONData);
-		ByteArrayOutputStream JSONTransMobileData = transactionMultiPayBillMobile(jaxbMarshallerEcsData);
-		sendJSONFactory.sendJSON_JCSMP(JSONTransMobileData);
-		try { Thread.sleep(1000/Integer.valueOf(rate)); } catch (InterruptedException e) {}
-		*/
-
-
-
 	}
 
 	/******************************************************
@@ -293,26 +371,13 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 	 * @return
 	 ******************************************************/
 	public static XMLGregorianCalendar timeToXml(Date date){
-		/*
-		TimeZone utc = TimeZone.getTimeZone("EST");
-		DateFormat dateFormat=new SimpleDateFormat("HH:mm:ss.sss");
-		dateFormat.setTimeZone(utc);
-		String strDate=dateFormat.format(date);
-		System.out.println(strDate);
-		try {
-			XMLGregorianCalendar xmlDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(strDate);
-			return xmlDate;
-		}
-		catch (  DatatypeConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-		 */
+		
 		GregorianCalendar gregorianCalendar = new GregorianCalendar();
 		DatatypeFactory datatypeFactory = null;
 		try {
 			datatypeFactory = DatatypeFactory.newInstance();
 		} catch (DatatypeConfigurationException e) {
-			// TODO Auto-generated catch block
+			logger.info(e.toString());
 			e.printStackTrace();
 		}
 		XMLGregorianCalendar now = 
@@ -343,6 +408,7 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 			docBuilder = docBuilderFactory.newDocumentBuilder();
 		} catch (ParserConfigurationException e1) {
 			// TODO Auto-generated catch block
+			logger.info(e1.toString());
 			e1.printStackTrace();
 		}
 		try {
@@ -378,7 +444,7 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 
 
 		} catch (SOAPException e) {
-			// TODO Auto-generated catch block
+			logger.info(e.getMessage());
 			e.printStackTrace();
 		} 
 
@@ -386,7 +452,7 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 		try {
 			soapMsg.writeTo(soapArrayOut);
 		} catch (SOAPException | IOException e) {
-			// TODO Auto-generated catch block
+			logger.info(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 		return soapArrayOut;
@@ -498,7 +564,7 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 
 
 		} catch (PropertyException e) {
-			// TODO Auto-generated catch block
+			logger.info(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 
@@ -621,7 +687,6 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 		evtBundle.setEvtInputLayouts(arrayEvents);
 
 		//Create  XML payload
-		//com.rbc.ecs.ObjectFactory reqMsg = new com.rbc.ecs.ObjectFactory ();
 		RunEventInputBundle dataMsg = new RunEventInputBundle();
 		dataMsg.setEventInputBundle(evtBundle);
 
@@ -638,13 +703,12 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 
 
 		} catch (PropertyException e) {
-			// TODO Auto-generated catch block
+			logger.info(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 
 
 		try {
-			//jaxbMarshallerEcsData.marshal(dataMsg, System.out);
 			jaxbMarshallerEcsData.marshal(dataMsg, out);
 			//System.out.println("SOAP Body:\n" + out.toString("ISO-8859-1") + "\n");
 
@@ -652,7 +716,7 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 		} 
 
 		catch (JAXBException e) {
-			// TODO Auto-generated catch block
+			logger.info(e.getLocalizedMessage());
 			e.printStackTrace();
 		} 
 
@@ -680,7 +744,6 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 
 		//Create a input record
 		int numRecords = randInt(1,5);
-		//int numRecords = 1;
 		//System.out.println("Number of records: " + numRecords);
 		arrayEvents = new ArrayOfEvtInputLayout();
 		arrayEventsParty = new ArrayOfEvtPrtyInfo();
@@ -699,11 +762,9 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 
 			// Create new dataRecord to be different from 
 			EvtInputLayout dataRecordTransOLB = reqLayout.createEvtInputLayout();
-			//dataRecord = reqLayout.createEvtInputLayout();
 			EvtPrtyInfo dataRecordParty = reqLayout.createEvtPrtyInfo();
 			EvtActvyTypFeatureReltn dataRecordFeature = reqLayout.createEvtActvyTypFeatureReltn();
 
-			//JAXBElement<String> EvtId = reqLayout.createEvtInputLayoutEvtId(String.valueOf(counter++));
 			JAXBElement<String> EvtId = reqLayout.createEvtInputLayoutEvtId(String.valueOf(guuid));
 			dataRecordTransOLB.setEvtId(EvtId);
 			dataRecordTransOLB.setEvtSysAppCd("3M00");
@@ -712,15 +773,7 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 			dataRecordTransOLB.setEvtStatusCd(reqLayout.createEvtInputLayoutEvtStatusCd("001"));
 			dataRecordTransOLB.setEvtResultCd(reqLayout.createEvtInputLayoutEvtResultCd("011"));
 			dataRecordTransOLB.setEvtChannelTypCd(reqLayout.createEvtInputLayoutEvtChannelTypCd("034"));
-			/*
-			int cardSuffix = randInt(0,99);
-			String s_cardSuffix;
-			if ( cardSuffix < 10) {
-				s_cardSuffix = "0" + String.valueOf(cardSuffix);
-			} else {
-				s_cardSuffix = String.valueOf(cardSuffix);
-			}
-			 */
+			
 			String cardNo = dataRecord.getEvtCardNo().getValue();
 			dataRecordTransOLB.setEvtCardNo(reqLayout.createEvtInputLayoutEvtCardNo(cardNo));
 
@@ -822,20 +875,15 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 		RunEventInputBundle dataMsg = new RunEventInputBundle();
 		dataMsg.setEventInputBundle(evtBundle);
 
-
-
-
-		//String SOAP_Payload = null;
 		ByteArrayOutputStream out= new ByteArrayOutputStream();
 
 		try {
 
 			jaxbMarshallerEcsData.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			//jaxbMarshallerEcsData.setProperty(Marshaller.JAXB_ENCODING, SOAP_Payload);
 
 
 		} catch (PropertyException e) {
-			// TODO Auto-generated catch block
+			logger.info(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 
@@ -849,12 +897,10 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 		} 
 
 		catch (JAXBException e) {
-			// TODO Auto-generated catch block
+			logger.info(e.getMessage());
 			e.printStackTrace();
 		} 
 
-
-		//ByteArrayOutputStream  soapArrayOut = buildSOAPMsg(out);
 
 		return out;
 
@@ -909,15 +955,7 @@ public class Bank_TestDataGeneratorOLBMobileJCSMP_JSON  {
 			dataRecordTransMobile.setEvtStatusCd(reqLayout.createEvtInputLayoutEvtStatusCd("001"));
 			dataRecordTransMobile.setEvtResultCd(reqLayout.createEvtInputLayoutEvtResultCd("011"));
 			dataRecordTransMobile.setEvtChannelTypCd(reqLayout.createEvtInputLayoutEvtChannelTypCd("021"));
-			/*
-					int cardSuffix = randInt(0,99);
-					String s_cardSuffix;
-					if ( cardSuffix < 10) {
-						s_cardSuffix = "0" + String.valueOf(cardSuffix);
-					} else {
-						s_cardSuffix = String.valueOf(cardSuffix);
-					}
-			 */
+
 			String cardNo = dataRecord.getEvtCardNo().getValue();
 			dataRecordTransMobile.setEvtCardNo(reqLayout.createEvtInputLayoutEvtCardNo(cardNo));
 

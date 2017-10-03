@@ -115,7 +115,7 @@ public class Bank_TestDataGenerator {
 
 		String authStringEnc = new String(authEncBytes);
 
-		// Create a method instanc
+		// Create a method instance
 		//HttpHost targetHost = new HttpHost("69.20.234.126", 20010, "http");
 		HttpHost targetHost = new HttpHost("160.101.136.83", 20010, "http");
 		CloseableHttpClient httpclient = HttpClients.createDefault();

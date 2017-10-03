@@ -72,7 +72,7 @@ import ecs.data.EvtActvyTypFeatureReltn;
 import ecs.data.EvtInputLayout;
 import ecs.data.EvtPrtyInfo;
 
-
+@SuppressWarnings("unused")
 public class Bank_TestDataGenerator_ATM  {
 
 	SchemaFactory sf = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema"); 
@@ -113,6 +113,7 @@ public class Bank_TestDataGenerator_ATM  {
 	private final static String salt="DGE$5SGr@3VsHYUMas2323E4d57vfBfFSTRU@!DSH(*%FDSdfg13sgfsg";
 
 	private static int transCount = 0;
+	
 	
 	private static String atmID = "";
 	

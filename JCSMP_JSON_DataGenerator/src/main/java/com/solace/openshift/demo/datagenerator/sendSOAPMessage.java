@@ -35,7 +35,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.bank.ecs.EventInputBundleImplService;
-
+@SuppressWarnings("unused")
 public class sendSOAPMessage {
 	
 	String authString;
@@ -52,7 +52,7 @@ public class sendSOAPMessage {
 		//String authString = "heinz1:heinz1";
 		authString = user + ":" + password;
 		//System.out.println("AuthString: " + authString);
-		this.authString = authString;
+		//this.authString = authString;
 		byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
 		authStringEnc = new String(authEncBytes);
 		client = HttpClientBuilder.create().build();

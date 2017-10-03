@@ -41,15 +41,19 @@ import com.solacesystems.jcsmp.ProducerEventArgs;
 import com.solacesystems.jcsmp.SessionEvent;
 import com.solacesystems.jcsmp.SessionEventArgs;
 import com.solacesystems.jcsmp.SessionEventHandler;
+import com.solacesystems.jcsmp.SpringJCSMPFactory;
 import com.solacesystems.jcsmp.StaleSessionException;
 import com.solacesystems.jcsmp.TextMessage;
 import com.solacesystems.jcsmp.Topic;
 import com.solacesystems.jcsmp.XMLMessageConsumer;
 import com.solacesystems.jcsmp.XMLMessageProducer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @SuppressWarnings("unused")
 public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
-	
+	private static final Logger logger = LoggerFactory.getLogger(sendJSONMessageJCSMP_DR.class);
 	
 	volatile int counter = 0;
 	
@@ -59,6 +63,7 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
 	
 	Topic topic;
 	JCSMPSession session = null;
+	SpringJCSMPFactory solaceFactory = null;
 	XMLMessageProducer prod = null;
 	
 	final LinkedList<MsgInfo> msgList = new LinkedList<MsgInfo>();
@@ -67,48 +72,33 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
 	TextMessage textMsgReplay = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
 	
 	
-	JCSMPProperties properties = new JCSMPProperties();
-	
 	boolean everConnected = false;
 	boolean needRecovery = false;
 
 	
-	public sendJSONMessageJCSMP_DR(String user, String password, String vpn, String topicString, String host, String port) {
+	public sendJSONMessageJCSMP_DR(SpringJCSMPFactory _solaceFactory) {
 		
-		
-		
-		//JCSMPProperties properties = new JCSMPProperties();
-		properties.setProperty(JCSMPProperties.HOST, host + ":" + port);
-		properties.setProperty(JCSMPProperties.VPN_NAME, vpn);
-		properties.setProperty(JCSMPProperties.USERNAME, user);
-		properties.setProperty(JCSMPProperties.PASSWORD, password);
-		this.topic = JCSMPFactory.onlyInstance().createTopic(topicString);
-		properties.setProperty(JCSMPProperties.MESSAGE_ACK_MODE, JCSMPProperties.SUPPORTED_MESSAGE_ACK_AUTO);
-		properties.setProperty(JCSMPProperties.GENERATE_SEQUENCE_NUMBERS, true);
-		//needed for DR
-		properties.setProperty(JCSMPProperties.GD_RECONNECT_FAIL_ACTION, JCSMPProperties.GD_RECONNECT_FAIL_ACTION_AUTO_RETRY);
-		
-		JCSMPChannelProperties c_properties = (JCSMPChannelProperties) properties.getProperty(JCSMPProperties.CLIENT_CHANNEL_PROPERTIES);
-		c_properties.setConnectRetries(-1);
-		c_properties.setConnectRetriesPerHost(0);
-		c_properties.setConnectTimeoutInMillis(2000);
-
-		c_properties.setReconnectRetries(-1);	
-		c_properties.setReconnectRetryWaitInMillis(2000);
-
-	
+		this.solaceFactory = _solaceFactory;
 		try {
-			session = JCSMPFactory.onlyInstance().createSession(properties, null, new PrintingSessionEventHandler());
-			
-		} catch (InvalidPropertiesException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			session = solaceFactory.createSession(null, new PrintingSessionEventHandler());
+		} catch (InvalidPropertiesException e1) {
+			logger.info(e1.getLocalizedMessage());
+			e1.printStackTrace();
 		}
+		
+		if( System.getenv("MSG_TOPIC") !=null) {
+			topic = JCSMPFactory.onlyInstance().createTopic(System.getenv("MSG_TOPIC"));
+			logger.info("Publishing Topic is set to: " + topic);
+		} else {
+			topic = JCSMPFactory.onlyInstance().createTopic("bank/data/json");
+			logger.info("Publishing Topic is set to: " + topic);
+		}
+
 		try {
 			prod = session.getMessageProducer(new PubCallback());
 		} catch (JCSMPException e) {
 			//possible there was a DR fail-over
-			
+			logger.info(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 
@@ -133,21 +123,15 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
 			 jsonText = jsonObject.toString(PRETTY_PRINT_INDENT_FACTOR);
 			 
 		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
+			logger.info(e1.getLocalizedMessage());
 			e1.printStackTrace();
 		}
-		//System.out.println(jsonText);
 		
-		
-		//TextMessage textMsg = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
-		//textMsg.setText(soapArrayOut.toString());
-		//textMsg.clearAttachment();
-		//textMsg.clearContent();
 		textMsg.reset();
 		textMsg.setText(jsonText);
 		textMsg.setDeliveryMode(DeliveryMode.PERSISTENT);
 		textMsg.setDeliverToOne(true);
-		//textMsg.setApplicationMessageId(UUID.randomUUID().toString());
+
 		textMsg.setApplicationMessageId(Integer.toString(counter));
 		
 		
@@ -171,7 +155,9 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
             //NOTE: The session will never stop attempting reconnecting until
             //      cp.setReconnectRetries(-1) is set to zero or a finite value
             //      in the createSession method.
-            System.out.println("+++++++++Stale Conenction: " + ex.getMessage());
+            
+			//System.out.println("+++++++++Stale Conenction: " + ex.getMessage());
+            logger.info("+++++++++Stale Conenction: " + ex.getMessage());
 
             //The session and producer will get rebuilt once handleErrorEx
             //receive the JCSMPTransportException that made this producer go
@@ -181,7 +167,8 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
             //Call session.closeSession() in the above for loop to get this
             //exception.  Calling close() for the producer will also
             //cause this exception to happen.
-            System.out.println(ex.getMessage());
+            //System.out.println(ex.getMessage());
+            logger.info(ex.getLocalizedMessage());
             
             //The application closed the session, so do not attempt to
             //reconnect the session.
@@ -192,6 +179,7 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
                 System.exit(1);
             }
         } catch (Exception ex) {
+        		logger.info("Encountered an Exception... " + ex.getMessage());
             System.err.println("Encountered an Exception... " + ex.getMessage());
             System.exit(1);
         }
@@ -212,10 +200,13 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
 			// During DR fail-over you may still be connected the broker that is now in standby and tried to send a message, keep message for replay
 			// after fail-over for DR complete
 			System.out.println("+++++++++++++++++++++++++in JCSMPStreamingPublishCorrelatingEventHandler in error handler");
+			logger.info("+++++++++++++++++++++++++in JCSMPStreamingPublishCorrelatingEventHandler in error handler");
+
 			if (key instanceof MsgInfo) {
 				MsgInfo i = (MsgInfo) key;
 				i.acked = false;
 				System.out.printf("Message response (rejected) received for %s, error was %s \n", i, cause);
+				logger.info("Message response (rejected) received for %s, error was %s \n", i, cause);
 				msgList.remove(i); // should be part of replay
 				msgListReplay.add(i);
 				needRecovery = true; //need recovery for sure
@@ -228,10 +219,9 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
 			if (key instanceof MsgInfo) {
 				MsgInfo i = (MsgInfo) key;
 				i.acked = true;
-				//System.out.printf("Message response (accepted) received for %s \n", i.id);
-				//System.out.println("Sequence number: " + i.sessionIndependentMessage.getSequenceNumber());
+				
 				msgList.remove(i);
-				//System.out.println("Size of msgList: " + msgList.size());
+				
 			}
 			
 		}
@@ -292,9 +282,13 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
 		
 
 		System.out.println("Replaying this many messages that could not be processed before DR: " + msgListReplay.size() + " with this many unacked: " + msgList.size());
+		logger.info("Replaying this many messages that could not be processed before DR: " + msgListReplay.size() + " with this many unacked: " + msgList.size());
 		
-		if( msgList.peekFirst() != null)
+		if( msgList.peekFirst() != null) {
 			System.out.println("First unacked from list: " + msgList.peekFirst().id + " last message from list: " + msgList.peekLast().id);
+			logger.info("First unacked from list: " + msgList.peekFirst().id + " last message from list: " + msgList.peekLast().id);
+		
+		}
 		
 		while(msgListReplay.peek() != null) {
 			
@@ -311,9 +305,6 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
 	
 			msgList.add(msgReplay);
 			
-			//msgCorrelationInfo.sessionIndependentMessage = textMsgReplay;
-			//msgCorrelationInfo.id = 
-		//	msgList.add(msgCorrelationInfo);
 
 			// Set the message's correlation key. This reference
 			// is used when calling back to responseReceivedEx().
@@ -322,6 +313,7 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
 			try {
 				prod.send(textMsgReplay, topic);
 				System.out.println("Replay message sent with ID: " + msgReplay.id);
+				logger.info("Replay message sent with ID: " + msgReplay.id);
 				//msgReplay.acked = true; // use this to remove message from active list after it is replayed 
 			} catch (StaleSessionException ex) {
 				//Session lost connection and stopped attempting reconnecting.
@@ -329,6 +321,7 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
 				//      cp.setReconnectRetries(-1) is set to zero or a finite value
 				//      in the createSession method.
 				System.out.println(ex.getMessage());
+				logger.info(ex.getLocalizedMessage());
 
 				//The session and producer will get rebuilt once handleErrorEx
 				//receive the JCSMPTransportException that made this producer go
@@ -349,6 +342,7 @@ public class sendJSONMessageJCSMP_DR implements JCSMPProducerEventHandler {
 		
 			} catch (Exception ex) {
 				System.err.println("Encountered an Exception... " + ex.getMessage());
+				logger.info("Encountered an Exception... " + ex.getMessage());
 				System.exit(1);
 			}
 			

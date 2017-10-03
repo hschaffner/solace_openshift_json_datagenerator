@@ -1,7 +1,7 @@
 package com.solace.openshift.demo.datagenerator;
 
 
-import javax.imageio.IIOException;
+//import javax.imageio.IIOException;
 
 import com.solacesystems.jcsmp.BytesXMLMessage;
 import com.solacesystems.jcsmp.InvalidPropertiesException;
