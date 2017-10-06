@@ -1,3 +1,20 @@
+/** 
+ *  Copyright 2009-2017 Solace Systems, Inc. All rights reserved
+ *  
+ *  http://www.solace.com
+ *  
+ *  This source is distributed WITHOUT ANY WARRANTY or support;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ *  A PARTICULAR PURPOSE.  All parts of this program are subject to
+ *  change without notice including the program's CLI options.
+ *
+ *  Unlimited use and re-distribution of this unmodified source code is   
+ *  authorized only with written permission.  Use of part or modified  
+ *  source code must carry prominent notices stating that you modified it, 
+ *  and give a relevant date.
+ */
+
+
 package com.solace.openshift.demo.datagenerator;
 
 import java.io.ByteArrayOutputStream;
