@@ -1,4 +1,3 @@
-/*
 
 /** 
  *  Copyright 2009-2017 Solace Systems, Inc. All rights reserved
@@ -17,16 +16,6 @@
  */
 
 
-package com.solace.RBCTestData;
-
-public class RBC_TestDataGeneratorOLBMobileJCSMP_JSON_DR {
-
-	public RBC_TestDataGeneratorOLBMobileJCSMP_JSON_DR() {
-		// TODO Auto-generated constructor stub
-	}
-
-}
-*/
 
 package com.solace.openshift.demo.datagenerator;
 
