@@ -1,0 +1,947 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 (http://www.altova.com)  -->
+<wsdl:definitions xmlns:impl="http://ECS.BANK.COM" xmlns:intf="http://ECS.BANK.COM" xmlns:tns2="http://data.ECS" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsi="http://ws-i.org/profiles/basic/1.1/xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://ECS.BANK.COM">
+	<wsdl:types>
+		<schema targetNamespace="http://data.ECS" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:intf="http://ECS.BANK.COM" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<import namespace="http://ECS.BANK.COM"/>
+			<complexType name="EVTINPUTBUNDLE">
+				<sequence>
+					<element name="evt__input__layouts" nillable="false" type="impl:ArrayOf_evt__input__layout"/>
+				</sequence>
+			</complexType>
+			<complexType name="evt__input__layout">
+				<sequence>
+					<element name="evt__id" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="100"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__sys__app__cd" nillable="false">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="4"/>
+								<maxLength value="5"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__processing__centre" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__status__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__result__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__business__process__id" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="100"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__group__status__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__date" nillable="false" type="xsd:date"/>
+					<element name="evt__time" nillable="false" type="xsd:time"/>
+					<element name="evt__date__utc" minOccurs="0" nillable="true" type="xsd:date"/>
+					<element name="evt__time__utc" minOccurs="0" nillable="true" type="xsd:time"/>
+					<element name="evt__msg__version" minOccurs="1" nillable="false">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="20"/>
+								<pattern value="1.3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__prty__infos" minOccurs="0" nillable="true" type="impl:ArrayOf_evt__prty__info"/>
+					<element name="evt__product__feature__reltns" minOccurs="0" nillable="true" type="impl:ArrayOf_evt__product__feature__reltn"/>
+					<element name="evt__actvy__typ__feature__reltns" nillable="false" type="impl:ArrayOf_evt__actvy__typ__feature__reltn"/>
+					<element name="evt__amount" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="16"/>
+								<pattern value="[0-9]([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?(\.[0-9]([0-9])?)?"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__amount__cad" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="16"/>
+								<pattern value="[0-9]([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?(\.[0-9]([0-9])?)?"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__currency__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__forex__cad__rate" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="17"/>
+								<pattern value="[0-9]([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?(\.[0-9]([0-9]([0-9]([0-9]([0-9]([0-9]([0-9]([0-9]([0-9])?)?)?)?)?)?)?)?)?"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__settlement__amount" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="16"/>
+								<pattern value="[0-9]([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?([0-9])?(\.[0-9]([0-9])?)?"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__settlement__currency__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__source__channel__instance__id" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="100"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__channel__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__transit__no" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="5"/>
+								<maxLength value="5"/>
+								<pattern value="[0-9]+"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__access__device__id" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="50"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__access__device__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__access__device__sub__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__access__device__os__version" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="10"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__access__device__sim__card__no" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="20"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__access__device__model_no" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="20"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__access__device__geo__loc__long" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="10"/>
+								<pattern value="[0-9]([0-9])([0-9])?(\.[0-9]([0-9]([0-9]([0-9]([0-9]([0-9])?)?)?)?)?)?"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__access__device__geo__loc__lat" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="10"/>
+								<pattern value="[0-9]([0-9])([0-9])?(\.[0-9]([0-9]([0-9]([0-9]([0-9]([0-9])?)?)?)?)?)?"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__contact__mthd__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__contact__point__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__card__no" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="16"/>
+								<maxLength value="16"/>
+								<pattern value="[0-9]+"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__card__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__card__issuing__fi" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="5"/>
+								<pattern value="[0-9]+"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__card__issue__no" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="2"/>
+								<pattern value="[0-9]+"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__card__sequence__no" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="3"/>
+								<pattern value="[0-9]+"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__cross__sell__indicator" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="1"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__identity__vldtn__mthd__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__fulfillment__mthd__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__appointment__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__appointment__desc__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__appointment__purpose__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="4"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__initd__by__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__comment" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="0"/>
+								<maxLength value="1000"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__acct__app__sys__app__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="4"/>
+								<maxLength value="5"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__acct__app__id" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="100"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__acct__dr__cr__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__campaign__id" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="20"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__offer__expiry__date" minOccurs="0" nillable="true" type="xsd:date"/>
+					<element name="evt__adjudication__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="5"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__orgnt__app__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="4"/>
+								<maxLength value="5"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__mktg__reference__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="30"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__offer__interest__rate" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="10"/>
+								<pattern value="[0-9]([0-9])?(\.[0-9]([0-9]([0-9]([0-9]([0-9]([0-9]([0-9])?)?)?)?)?)?)?"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__session__id" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="100"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__addr__usg__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__addr__lin__1__txt" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="40"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__addr__lin__2__txt" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="40"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__cty__twn__nm" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="30"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__subcntry__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="2"/>
+								<maxLength value="2"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__pstl__zip__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="13"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__cntry__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__req__auth__mthd__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__orgnt__ip__addr__txt" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="128"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__mb__devc__crr__co__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__ofi__tr__no" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="8"/>
+								<pattern value="[0-9]+"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__ofi__bnk__no" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="5"/>
+								<pattern value="[0-9]+"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__ofi__acct__no" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="40"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__ofi__acct__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__ofi__acct__own_dclrn__ind" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="1"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__delvry__mthd__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__business__process__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="10"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__acs__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="30"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__mktg__sys__app__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="5"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__membrshp__id" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="100"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__membrshp__id__typ" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="100"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__mktg__adjdcn__typ__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="10"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__rtl__prtnr__agt__id" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="30"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__rtl__prtnr__store__id" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="10"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__business__context__id" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="100"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__mb__devc__cntry__cd" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__extensions" minOccurs="0" nillable="true" type="impl:ArrayOf_evt__extension"/>
+				</sequence>
+			</complexType>
+			<complexType name="evt__prty__info">
+				<sequence>
+					<choice>
+						<element name="evt__clnt__no" nillable="false">
+							<simpleType>
+								<restriction base="xsd:string">
+									<minLength value="1"/>
+									<maxLength value="13"/>
+									<pattern value="[0-9]+"/>
+								</restriction>
+							</simpleType>
+						</element>
+						<element name="evt__prspct__id" nillable="false">
+							<simpleType>
+								<restriction base="xsd:string">
+									<minLength value="1"/>
+									<maxLength value="100"/>
+								</restriction>
+							</simpleType>
+						</element>
+						<element name="evt__employee__id" nillable="false">
+							<simpleType>
+								<restriction base="xsd:string">
+									<minLength value="1"/>
+									<maxLength value="9"/>
+									<pattern value="[0-9]+"/>
+								</restriction>
+							</simpleType>
+						</element>
+						<element name="evt__payee__id" nillable="false">
+							<simpleType>
+								<restriction base="xsd:string">
+									<minLength value="1"/>
+									<maxLength value="9"/>
+									<pattern value="[0-9]+"/>
+								</restriction>
+							</simpleType>
+						</element>
+						<element name="evt__secaf__card__id" nillable="false">
+							<simpleType>
+								<restriction base="xsd:string">
+									<minLength value="1"/>
+									<maxLength value="10"/>
+									<pattern value="[0-9]+"/>
+								</restriction>
+							</simpleType>
+						</element>
+						<element name="evt__party__search__key" nillable="false">
+							<simpleType>
+								<restriction base="xsd:string">
+									<minLength value="1"/>
+									<maxLength value="100"/>
+								</restriction>
+							</simpleType>
+						</element>
+					</choice>
+					<element name="evt__prty__sys__app__cd" nillable="false">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="4"/>
+								<maxLength value="5"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__prty__reltn__typ__cd" nillable="false">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__prty__role__cd" nillable="false">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="3"/>
+								<maxLength value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+				</sequence>
+			</complexType>
+			<complexType name="evt__product__feature__reltn">
+				<sequence>
+					<element name="evt__product__feature__name" nillable="false">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="50"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__product__feature__cd" nillable="false">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="50"/>
+							</restriction>
+						</simpleType>
+					</element>
+				</sequence>
+			</complexType>
+			<complexType name="evt__actvy__typ__feature__reltn">
+				<sequence>
+					<element name="evt__actvy__typ__feature__name" nillable="false">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="50"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__actvy__typ__feature__cd" nillable="false">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="50"/>
+							</restriction>
+						</simpleType>
+					</element>
+				</sequence>
+			</complexType>
+			<complexType name="evt__extension">
+				<sequence>
+					<element name="evt__extension__name" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="50"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__extension__value" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="500"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__extension__seq__no" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="18"/>
+								<pattern value="[0-9]+"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__extension__debug__strg" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="500"/>
+							</restriction>
+						</simpleType>
+					</element>
+				</sequence>
+			</complexType>
+			<complexType name="EVTINPUTBUNDLERESPONSE">
+				<sequence>
+					<element name="evt__input__res__code" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="4"/>
+								<pattern value="[0-9]+"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="evt__input__res__desc" minOccurs="0" nillable="true">
+						<simpleType>
+							<restriction base="xsd:string">
+								<minLength value="1"/>
+								<maxLength value="100"/>
+							</restriction>
+						</simpleType>
+					</element>
+				</sequence>
+			</complexType>
+		</schema>
+		<schema targetNamespace="http://ECS.BANK.COM" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns2="http://data.ECS" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<import namespace="http://data.ECS"/>
+			<complexType name="ArrayOf_evt__prty__info">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="evt__prty__info" nillable="true" type="tns2:evt__prty__info"/>
+				</sequence>
+			</complexType>
+			<complexType name="ArrayOf_evt__product__feature__reltn">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="evt__product__feature__reltn" nillable="true" type="tns2:evt__product__feature__reltn"/>
+				</sequence>
+			</complexType>
+			<complexType name="ArrayOf_evt__actvy__typ__feature__reltn">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="1" name="evt__actvy__typ__feature__reltn" nillable="false" type="tns2:evt__actvy__typ__feature__reltn"/>
+				</sequence>
+			</complexType>
+			<complexType name="ArrayOf_evt__extension">
+				<sequence>
+					<element maxOccurs="500" minOccurs="0" name="evt__extension" nillable="true" type="tns2:evt__extension"/>
+				</sequence>
+			</complexType>
+			<complexType name="ArrayOf_evt__input__layout">
+				<sequence>
+					<element maxOccurs="100" minOccurs="1" name="evt__input__layout" nillable="false" type="tns2:evt__input__layout"/>
+				</sequence>
+			</complexType>
+			<element name="runEventInputBundleResponse">
+				<complexType>
+					<sequence>
+						<element name="EventInputBundleResponse" minOccurs="0" nillable="true" type="tns2:EVTINPUTBUNDLERESPONSE"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="runEventInputBundle">
+				<complexType>
+					<sequence>
+						<element name="EventInputBundle" nillable="false" type="tns2:EVTINPUTBUNDLE"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="getUUIDRequest">
+				<complexType>
+					<sequence>
+						<element name="evt__msg__version" minOccurs="1" nillable="false">
+							<simpleType>
+								<restriction base="xsd:string">
+									<minLength value="1"/>
+									<maxLength value="20"/>
+									<pattern value="1.3"/>
+								</restriction>
+							</simpleType>
+						</element>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="getUUIDResponse">
+				<complexType>
+					<sequence>
+						<element name="uuid" minOccurs="1" nillable="false">
+							<simpleType>
+								<restriction base="xsd:string"/>
+							</simpleType>
+						</element>
+					</sequence>
+				</complexType>
+			</element>
+		</schema>
+	</wsdl:types>
+	<wsdl:message name="runEventInputBundleResponse">
+		<wsdl:part name="parameters" element="intf:runEventInputBundleResponse"/>
+	</wsdl:message>
+	<wsdl:message name="runEventInputBundleRequest">
+		<wsdl:part name="parameters" element="intf:runEventInputBundle"/>
+	</wsdl:message>
+	<wsdl:message name="getUUIDRequest">
+		<wsdl:part name="parameters" element="intf:getUUIDRequest"/>
+	</wsdl:message>
+	<wsdl:message name="getUUIDResponse">
+		<wsdl:part name="parameters" element="intf:getUUIDResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="eventInputBundleImpl">
+		<wsdl:operation name="runEventInputBundle">
+			<wsdl:input name="runEventInputBundleRequest" message="impl:runEventInputBundleRequest"/>
+			<wsdl:output name="runEventInputBundleResponse" message="impl:runEventInputBundleResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="getUUID">
+			<wsdl:input name="getUUIDRequest" message="impl:getUUIDRequest"/>
+			<wsdl:output name="getUUIDResponse" message="impl:getUUIDResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="eventInputBundleImplSoapBinding" type="intf:eventInputBundleImpl">
+		<wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsaw:UsingAddressing wsdl:required="false" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"/>
+		<wsdl:operation name="runEventInputBundle">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="runEventInputBundleRequest">
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output name="runEventInputBundleResponse">
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getUUID">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="getUUIDRequest">
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output name="getUUIDResponse">
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="eventInputBundleImplService">
+		<wsdl:port name="eventInputBundleImpl" binding="intf:eventInputBundleImplSoapBinding">
+			<wsdlsoap:address location="http://localhost:9080/ECS-Reporting/services/eventInputBundleImpl"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

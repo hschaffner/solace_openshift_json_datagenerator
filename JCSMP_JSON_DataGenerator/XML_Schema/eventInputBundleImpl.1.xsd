@@ -1,0 +1,70 @@
+<!-- edited with XMLSpy v2015 sp1 (x64) (http://www.altova.com)  -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns2="http://data.ECS" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:impl="http://ECS.BANK.COM" xmlns:intf="http://ECS.BANK.COM" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsi="http://ws-i.org/profiles/basic/1.1/xsd" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="http://ECS.BANK.COM">
+	<import namespace="http://schemas.xmlsoap.org/soap/encoding/" schemaLocation="http://schemas.xmlsoap.org/soap/encoding/"/>
+	<import namespace="http://data.ECS"/>
+	<complexType name="ArrayOf_evt__prty__info">
+		<sequence>
+			<element name="evt__prty__info" type="tns2:evt__prty__info" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	<complexType name="ArrayOf_evt__product__feature__reltn">
+		<sequence>
+			<element name="evt__product__feature__reltn" type="tns2:evt__product__feature__reltn" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	<complexType name="ArrayOf_evt__actvy__typ__feature__reltn">
+		<sequence>
+			<element name="evt__actvy__typ__feature__reltn" type="tns2:evt__actvy__typ__feature__reltn" nillable="false" minOccurs="1" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	<complexType name="ArrayOf_evt__extension">
+		<sequence>
+			<element name="evt__extension" type="tns2:evt__extension" nillable="true" minOccurs="0" maxOccurs="500"/>
+		</sequence>
+	</complexType>
+	<complexType name="ArrayOf_evt__input__layout">
+		<sequence>
+			<element name="evt__input__layout" type="tns2:evt__input__layout" nillable="false" minOccurs="1" maxOccurs="100"/>
+		</sequence>
+	</complexType>
+	<element name="runEventInputBundleResponse">
+		<complexType>
+			<sequence>
+				<element name="EventInputBundleResponse" type="tns2:EVTINPUTBUNDLERESPONSE" nillable="true" minOccurs="0"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="runEventInputBundle">
+		<complexType>
+			<sequence>
+				<element name="EventInputBundle" type="tns2:EVTINPUTBUNDLE" nillable="false"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="getUUIDRequest">
+		<complexType>
+			<sequence>
+				<element name="evt__msg__version" nillable="false" minOccurs="1">
+					<simpleType>
+						<restriction base="xsd:string">
+							<minLength value="1"/>
+							<maxLength value="20"/>
+							<pattern value="1.3"/>
+						</restriction>
+					</simpleType>
+				</element>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="getUUIDResponse">
+		<complexType>
+			<sequence>
+				<element name="uuid" nillable="false" minOccurs="1">
+					<simpleType>
+						<restriction base="xsd:string"/>
+					</simpleType>
+				</element>
+			</sequence>
+		</complexType>
+	</element>
+</schema>
