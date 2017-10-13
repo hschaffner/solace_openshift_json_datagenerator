@@ -1,0 +1,158 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: solace-json-jcsmp-datagenerator
+  annotations:
+    description: Sample Spring Boot Application that demonstrate messaging with the Solace VMR - generators JSON Bank Transactions pver JCSMP
+    iconClass: icon-phalcon
+    tags: 'instant-app,springboot,maven,java'
+objects:
+  - kind: BuildConfig
+    apiVersion: v1
+    metadata:
+      name: '${APPLICATION_NAME}-data-generator-jcsmp-json'
+    spec:
+      triggers:
+        - type: ImageChange
+          imageChange: {}
+      source:
+        type: Git
+        git:
+          uri: '${GIT_URI}'
+          ref: '${GIT_REF}'
+        contextDir: 'JCSMP_JSON_DataGenerator'
+      strategy:
+        type: Source
+        sourceStrategy:
+          from:
+            kind: ImageStreamTag
+   #         name: 's2i-java:latest'
+            name: 'jdk-us-app:latest'
+      output:
+        to:
+          kind: ImageStreamTag
+          name: '${APPLICATION_NAME}-data-generator-jcsmp-json:latest'
+      resources: {}
+  - kind: ImageStream
+    apiVersion: v1
+    metadata:
+      name: '${APPLICATION_NAME}-data-generator-jcsmp-json'
+    spec:
+      dockerImageRepository: ''
+      tags:
+        - name: latest
+
+  - kind: DeploymentConfig
+    apiVersion: v1
+    metadata:
+      name: '${APPLICATION_NAME}-data-generator-jcsmp-json'
+    spec:
+      strategy:
+        type: Rolling
+        rollingParams:
+          updatePeriodSeconds: 1
+          intervalSeconds: 1
+          timeoutSeconds: 600
+        resources: {}
+      triggers:
+        - type: ConfigChange
+        - type: ImageChange
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - '${APPLICATION_NAME}-data-generator-jcsmp-json'
+            from:
+              kind: ImageStreamTag
+              name: '${APPLICATION_NAME}-data-generator-jcsmp-json:latest'
+      replicas: 1
+      selector:
+        deploymentconfig: '${APPLICATION_NAME}-data-generator-jcsmp-json'
+      template:
+        metadata:
+          labels:
+            deploymentconfig: '${APPLICATION_NAME}-data-generator-jcsmp-json'
+        spec:
+          containers:
+            - name: '${APPLICATION_NAME}-data-generator-jcsmp-json'
+              image: '${APPLICATION_NAME}-data-generator-jcsmp-json'
+              ports:
+                - containerPort: 55555
+                  protocol: TCP
+              env:
+              - name: 'solace_java_host'
+                value: '${SOL_ADDRESS}'
+              - name: 'solace_java_msgVpn'
+                value: '${SOL_VPN}'
+              - name: 'solace_java_clientUsername'
+                value: '${SOL_CLIENTUSERNAME}'
+              - name: 'solace_java_clientPassword'
+                value: '${SOL_PASSWORD}'
+              - name: 'solace_java_advanced_jcsmp_GENERATE_SEQUENCE_NUMBERS'
+                value: '${MSG_SEQUENCENUMBERS}'
+              - name: 'MSG_RATE'
+                value: '${MSG_RATE}'
+              - name: 'MSG_TOPIC'
+                value: '${MSG_TOPIC}' 
+              - name: 'MSG_DR'
+                value: ${MSG_DR}
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                capabilities: {}
+                privileged: false
+          restartPolicy: Always
+          dnsPolicy: ClusterFirst
+          
+parameters:
+  - name: APPLICATION_NAME
+    displayName: Application name
+    description: The name for this Data Generator application.
+    generate: expression
+    from: '[A-Z0-9]{8}'
+    value: bank-simulator
+    required: true
+  - name: SOL_ADDRESS
+    description: The address and port for the Solace Messages Router
+    value: test-cluster-svc.vmr-openshift-demo.svc:55555
+    required: true
+  - name: SOL_CLIENTUSERNAME
+    description: The client name for access to the Solace Message Broker
+    value: 'heinz1'
+    required: true
+  - name: SOL_PASSWORD
+    description: The password for the Solace client
+    value: 'heinz1'
+    required: true
+  - name: SOL_VPN
+    description: The VPN for the Solace client
+    value: 'heinzvpn'
+    required: true
+  - name: MSG_RATE
+    description: The rate the generator is supposed to send messages is messages/second
+    value: '1'
+    required: false
+  - name: MSG_TOPIC
+    description: The topic to send messages, it can be the Queue Network Name
+    value: 'bank/data/json'
+    required: false
+  - name: MSG_DR
+    decription: Is the session based on DR connectivity true/false
+    value: 'false'
+    required: false
+  - name: MSG_SEQUENCENUMBERS
+    description: Do you want sequence numbers in the Solace address true/false
+    value: 'true'
+    required: false
+  - name: GIT_URI
+    description: Git source URI for application
+    value: 'https://github.com/hschaffner/solace_openshift_json_datagenerator'
+  - name: GIT_REF
+    description: Git branch/tag reference
+    value: 'master'
+
+ 
+labels:
+  application: solace-json-jcsmp-datagenerator
+  createdBy: template-solace-json-jcsmp-datagenerator
+          
